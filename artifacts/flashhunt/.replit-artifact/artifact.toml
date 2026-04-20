@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FlashHunt"
+version = "1.0.0"
+id = "artifacts/flashhunt"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25217
+
+[services.development]
+run = "pnpm --filter @workspace/flashhunt run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/flashhunt", "run", "build" ]
+publicDir = "artifacts/flashhunt/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25217"
+BASE_PATH = "/"

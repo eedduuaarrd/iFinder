@@ -1,15 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FlashHunt API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: hunt
+    description: Weekly hunt operations
+  - name: submissions
+    description: Hunt item submissions
+  - name: rankings
+    description: Leaderboard rankings
+  - name: friends
+    description: Friend system
+  - name: users
+    description: User profile operations
 paths:
   /healthz:
     get:
@@ -24,6 +35,387 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/profile:
+    patch:
+      operationId: updateProfile
+      tags: [auth]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileBody"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /hunt/current:
+    get:
+      operationId: getCurrentHunt
+      tags: [hunt]
+      summary: Get current week's hunt
+      responses:
+        "200":
+          description: Current hunt with items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hunt"
+
+  /hunt/current/items:
+    get:
+      operationId: getHuntItems
+      tags: [hunt]
+      summary: Get items for current hunt with user completion status
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hunt items with completion status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HuntItemWithStatus"
+
+  /hunt/current/progress:
+    get:
+      operationId: getMyProgress
+      tags: [hunt]
+      summary: Get my progress for this week's hunt
+      responses:
+        "200":
+          description: My hunt progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HuntProgress"
+
+  /submissions:
+    post:
+      operationId: submitHuntItem
+      tags: [submissions]
+      summary: Submit a found hunt item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubmissionBody"
+      responses:
+        "201":
+          description: Submission created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submission"
+        "400":
+          description: Invalid submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /submissions/my:
+    get:
+      operationId: getMySubmissions
+      tags: [submissions]
+      summary: Get my submissions for current week
+      responses:
+        "200":
+          description: My submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Submission"
+
+  /submissions/mosaic:
+    get:
+      operationId: getMyMosaic
+      tags: [submissions]
+      summary: Get my photo mosaic for the week
+      responses:
+        "200":
+          description: Mosaic data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MosaicData"
+
+  /rankings/global:
+    get:
+      operationId: getGlobalRanking
+      tags: [rankings]
+      summary: Get global leaderboard for current week
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Global ranking
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RankingEntry"
+
+  /rankings/local:
+    get:
+      operationId: getLocalRanking
+      tags: [rankings]
+      summary: Get local (city) leaderboard for current week
+      parameters:
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Local ranking
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RankingEntry"
+
+  /rankings/friends:
+    get:
+      operationId: getFriendsRanking
+      tags: [rankings]
+      summary: Get friends leaderboard for current week
+      responses:
+        "200":
+          description: Friends ranking
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RankingEntry"
+
+  /rankings/stats:
+    get:
+      operationId: getRankingStats
+      tags: [rankings]
+      summary: Get ranking stats for current user (positions in each leaderboard)
+      responses:
+        "200":
+          description: Ranking stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RankingStats"
+
+  /friends:
+    get:
+      operationId: getFriends
+      tags: [friends]
+      summary: Get my friends list
+      responses:
+        "200":
+          description: Friends list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Friend"
+
+  /friends/requests:
+    get:
+      operationId: getFriendRequests
+      tags: [friends]
+      summary: Get pending friend requests
+      responses:
+        "200":
+          description: Pending requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FriendRequest"
+
+  /friends/search:
+    get:
+      operationId: searchUsers
+      tags: [friends]
+      summary: Search users by username or email
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+
+  /friends/request:
+    post:
+      operationId: sendFriendRequest
+      tags: [friends]
+      summary: Send friend request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendFriendRequestBody"
+      responses:
+        "201":
+          description: Request sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FriendRequest"
+
+  /friends/request/{requestId}/accept:
+    post:
+      operationId: acceptFriendRequest
+      tags: [friends]
+      summary: Accept friend request
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friend"
+
+  /friends/request/{requestId}/reject:
+    post:
+      operationId: rejectFriendRequest
+      tags: [friends]
+      summary: Reject friend request
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Request rejected
+
+  /friends/{friendId}:
+    delete:
+      operationId: removeFriend
+      tags: [friends]
+      summary: Remove a friend
+      parameters:
+        - name: friendId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Friend removed
+
+  /users/{userId}:
+    get:
+      operationId: getUserProfile
+      tags: [users]
+      summary: Get a user's public profile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /users/{userId}/activity:
+    get:
+      operationId: getUserActivity
+      tags: [users]
+      summary: Get a user's recent activity (last found items)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +426,437 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        totalPoints:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - username
+        - totalPoints
+        - createdAt
+
+    UpdateProfileBody:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        city:
+          type: string
+        avatarUrl:
+          type: string
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        totalPoints:
+          type: integer
+      required:
+        - id
+        - username
+        - totalPoints
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        totalPoints:
+          type: integer
+        weekPoints:
+          type: integer
+        itemsFound:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - username
+        - totalPoints
+        - weekPoints
+        - itemsFound
+        - createdAt
+
+    Hunt:
+      type: object
+      properties:
+        id:
+          type: integer
+        weekStart:
+          type: string
+        weekEnd:
+          type: string
+        title:
+          type: string
+        totalPoints:
+          type: integer
+        itemCount:
+          type: integer
+      required:
+        - id
+        - weekStart
+        - weekEnd
+        - title
+        - totalPoints
+        - itemCount
+
+    HuntItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        huntId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        cocoLabel:
+          type: string
+        requiredColor:
+          type: ["string", "null"]
+        points:
+          type: integer
+        difficulty:
+          type: string
+        hint:
+          type: ["string", "null"]
+      required:
+        - id
+        - huntId
+        - name
+        - description
+        - cocoLabel
+        - points
+        - difficulty
+
+    HuntItemWithStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+        huntId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        cocoLabel:
+          type: string
+        requiredColor:
+          type: ["string", "null"]
+        points:
+          type: integer
+        difficulty:
+          type: string
+        hint:
+          type: ["string", "null"]
+        found:
+          type: boolean
+        submissionId:
+          type: ["integer", "null"]
+        photoUrl:
+          type: ["string", "null"]
+        foundAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - huntId
+        - name
+        - description
+        - cocoLabel
+        - points
+        - difficulty
+        - found
+
+    HuntProgress:
+      type: object
+      properties:
+        huntId:
+          type: integer
+        userId:
+          type: string
+        itemsFound:
+          type: integer
+        totalItems:
+          type: integer
+        pointsEarned:
+          type: integer
+        totalPoints:
+          type: integer
+        completionPercent:
+          type: number
+      required:
+        - huntId
+        - userId
+        - itemsFound
+        - totalItems
+        - pointsEarned
+        - totalPoints
+        - completionPercent
+
+    CreateSubmissionBody:
+      type: object
+      properties:
+        huntItemId:
+          type: integer
+        photoUrl:
+          type: string
+        detectedLabel:
+          type: string
+        detectedColor:
+          type: ["string", "null"]
+        confidence:
+          type: number
+        latitude:
+          type: ["number", "null"]
+        longitude:
+          type: ["number", "null"]
+      required:
+        - huntItemId
+        - photoUrl
+        - detectedLabel
+        - confidence
+
+    Submission:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        huntItemId:
+          type: integer
+        photoUrl:
+          type: string
+        detectedLabel:
+          type: string
+        detectedColor:
+          type: ["string", "null"]
+        confidence:
+          type: number
+        pointsAwarded:
+          type: integer
+        status:
+          type: string
+        foundAt:
+          type: string
+      required:
+        - id
+        - userId
+        - huntItemId
+        - photoUrl
+        - detectedLabel
+        - confidence
+        - pointsAwarded
+        - status
+        - foundAt
+
+    MosaicData:
+      type: object
+      properties:
+        huntTitle:
+          type: string
+        weekStart:
+          type: string
+        photos:
+          type: array
+          items:
+            type: object
+            properties:
+              itemName:
+                type: string
+              photoUrl:
+                type: string
+              points:
+                type: integer
+            required:
+              - itemName
+              - photoUrl
+              - points
+        totalPoints:
+          type: integer
+        totalItems:
+          type: integer
+      required:
+        - huntTitle
+        - weekStart
+        - photos
+        - totalPoints
+        - totalItems
+
+    RankingEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        userId:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        points:
+          type: integer
+        itemsFound:
+          type: integer
+        isCurrentUser:
+          type: boolean
+      required:
+        - rank
+        - userId
+        - username
+        - points
+        - itemsFound
+        - isCurrentUser
+
+    RankingStats:
+      type: object
+      properties:
+        globalRank:
+          type: ["integer", "null"]
+        localRank:
+          type: ["integer", "null"]
+        friendsRank:
+          type: ["integer", "null"]
+        weekPoints:
+          type: integer
+        totalPoints:
+          type: integer
+        city:
+          type: ["string", "null"]
+      required:
+        - weekPoints
+        - totalPoints
+
+    Friend:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        lastActivity:
+          type: ["string", "null"]
+        lastItemFound:
+          type: ["string", "null"]
+        weekPoints:
+          type: integer
+      required:
+        - id
+        - userId
+        - username
+        - weekPoints
+
+    FriendRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromUserId:
+          type: string
+        toUserId:
+          type: string
+        fromUsername:
+          type: string
+        fromDisplayName:
+          type: ["string", "null"]
+        fromAvatarUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - fromUserId
+        - toUserId
+        - fromUsername
+        - status
+        - createdAt
+
+    SendFriendRequestBody:
+      type: object
+      properties:
+        toUserId:
+          type: string
+      required:
+        - toUserId
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        username:
+          type: string
+        itemName:
+          type: string
+        photoUrl:
+          type: string
+        points:
+          type: integer
+        foundAt:
+          type: string
+      required:
+        - id
+        - userId
+        - username
+        - itemName
+        - photoUrl
+        - points
+        - foundAt
