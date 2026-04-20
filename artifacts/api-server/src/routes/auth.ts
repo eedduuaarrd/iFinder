@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
-import { eq, ilike, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 import { db, usersTable } from "@workspace/db";
 import {
   GetMeResponse,
@@ -9,6 +11,89 @@ import {
 
 const router: IRouter = Router();
 
+function serializeUser(user: Record<string, any>) {
+  return {
+    ...user,
+    createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+    updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
+  };
+}
+
+router.post("/auth/register", async (req, res): Promise<void> => {
+  const { email, password, username } = req.body;
+
+  if (!email || !password || !username) {
+    res.status(400).json({ error: "Email, password and username are required" });
+    return;
+  }
+
+  if (password.length < 6) {
+    res.status(400).json({ error: "Password must be at least 6 characters" });
+    return;
+  }
+
+  const [existingEmail] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+  if (existingEmail) {
+    res.status(400).json({ error: "Email already in use" });
+    return;
+  }
+
+  const [existingUsername] = await db.select().from(usersTable).where(eq(usersTable.username, username));
+  if (existingUsername) {
+    res.status(400).json({ error: "Username already taken" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const id = randomUUID();
+
+  const [user] = await db.insert(usersTable).values({
+    id,
+    email,
+    username,
+    passwordHash,
+    totalPoints: 0,
+  }).returning();
+
+  req.session.userId = user.id;
+  req.session.userEmail = user.email;
+
+  res.status(201).json(GetMeResponse.parse(serializeUser(user)));
+});
+
+router.post("/auth/login", async (req, res): Promise<void> => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ error: "Email and password are required" });
+    return;
+  }
+
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+  if (!user || !user.passwordHash) {
+    res.status(401).json({ error: "Invalid email or password" });
+    return;
+  }
+
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) {
+    res.status(401).json({ error: "Invalid email or password" });
+    return;
+  }
+
+  req.session.userId = user.id;
+  req.session.userEmail = user.email;
+
+  res.json(GetMeResponse.parse(serializeUser(user)));
+});
+
+router.post("/auth/logout", (req, res): void => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid");
+    res.json({ ok: true });
+  });
+});
+
 router.get("/auth/me", async (req, res): Promise<void> => {
   const userId = (req as any).userId;
   if (!userId) {
@@ -17,21 +102,12 @@ router.get("/auth/me", async (req, res): Promise<void> => {
   }
 
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
-
   if (!user) {
-    const email = (req as any).userEmail ?? `user_${userId}@flashhunt.app`;
-    const username = `user_${userId.slice(0, 8)}`;
-    const [newUser] = await db.insert(usersTable).values({
-      id: userId,
-      email,
-      username,
-      totalPoints: 0,
-    }).returning();
-    res.json(GetMeResponse.parse(newUser));
+    res.status(404).json({ error: "User not found" });
     return;
   }
 
-  res.json(GetMeResponse.parse(user));
+  res.json(GetMeResponse.parse(serializeUser(user)));
 });
 
 router.patch("/auth/profile", async (req, res): Promise<void> => {
@@ -64,7 +140,7 @@ router.patch("/auth/profile", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(UpdateProfileResponse.parse(user));
+  res.json(UpdateProfileResponse.parse(serializeUser(user)));
 });
 
 export default router;
