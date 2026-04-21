@@ -1,9 +1,9 @@
 export type Lang = "ca" | "es" | "en";
 
 export const LANGS: { code: Lang; label: string; flag: string }[] = [
-  { code: "ca", label: "Català", flag: "CA" },
-  { code: "es", label: "Castellano", flag: "ES" },
-  { code: "en", label: "English", flag: "EN" },
+  { code: "ca", label: "Català", flag: "🏴" },
+  { code: "es", label: "Castellano", flag: "🇪🇸" },
+  { code: "en", label: "English", flag: "🇬🇧" },
 ];
 
 type Dict = Record<string, string>;
@@ -16,6 +16,7 @@ const en: Dict = {
   "common.save": "SAVE",
   "common.continue": "CONTINUE",
   "common.back": "BACK",
+  "common.points": "PTS",
 
   "nav.hunt": "HUNT",
   "nav.ranks": "RANKS",
@@ -36,9 +37,23 @@ const en: Dict = {
   "auth.toSignUp": "New blood? Sign up",
   "auth.fail": "Authentication failed",
 
-  "hunt.title": "TARGETS",
+  "hunt.title": "THIS WEEK",
+  "hunt.subtitle": "10 TARGETS // FIND THEM",
   "hunt.empty": "NO ACTIVE HUNT",
   "hunt.found": "FOUND",
+  "hunt.progress": "PROGRESS",
+  "hunt.points": "POINTS",
+  "hunt.streak": "STREAK",
+  "hunt.streakDays": "DAYS",
+  "hunt.daily": "DAILY 2x",
+  "hunt.dailyDesc": "First hunt today: DOUBLE points!",
+  "hunt.combo": "COMBO",
+  "hunt.comboDesc": "Catch 2 in 5 min for +50%",
+  "hunt.timeLeft": "ENDS IN",
+  "hunt.completed": "WEEK CLEARED!",
+  "hunt.rank": "YOUR RANK",
+  "hunt.others": "OTHERS FOUND",
+  "hunt.tap": "TAP TO HUNT",
 
   "friends.title": "THE CREW",
   "friends.search": "SEARCH USERNAMES...",
@@ -55,11 +70,13 @@ const en: Dict = {
   "friends.accepted": "FRIEND ADDED",
   "friends.acceptedDesc": "You are now allies.",
 
-  "rankings.title": "RANKS",
+  "rankings.title": "LEADERBOARD",
   "rankings.local": "LOCAL",
   "rankings.global": "GLOBAL",
-  "rankings.friends": "FRIENDS",
+  "rankings.friends": "CREW",
   "rankings.empty": "NO DATA YET",
+  "rankings.foundShort": "FOUND",
+  "rankings.you": "YOU",
 
   "profile.title": "DOSSIER",
   "profile.logout": "LOGOUT",
@@ -70,6 +87,13 @@ const en: Dict = {
   "profile.share": "SHARE",
   "profile.noCaptures": "NO CAPTURES THIS WEEK",
   "profile.language": "LANGUAGE",
+  "profile.badges": "BADGES",
+  "profile.badge.first": "FIRST CATCH",
+  "profile.badge.streak": "ON FIRE",
+  "profile.badge.completer": "COMPLETIONIST",
+  "profile.badge.speedster": "SPEEDSTER",
+  "profile.badge.social": "SOCIALITE",
+  "profile.locked": "LOCKED",
 
   "camera.target": "TARGET",
   "camera.color": "COLOR",
@@ -82,6 +106,14 @@ const en: Dict = {
   "camera.notValid": "NOT VALID",
   "camera.giveUp": "GIVE UP",
   "camera.alreadyCaught": "ALREADY CAUGHT THIS ONE",
+  "camera.cameraDenied": "CAMERA ACCESS DENIED. ENABLE IT IN YOUR BROWSER.",
+  "camera.goBack": "GO BACK",
+  "camera.aiActive": "AI VISION ACTIVE",
+  "camera.scan1": "SCANNING FRAME...",
+  "camera.scan2": "DETECTING OBJECTS...",
+  "camera.scan3": "VERIFYING TARGET...",
+  "camera.scan4": "MEASURING CONFIDENCE...",
+  "camera.bonus": "SPEED BONUS!",
 };
 
 const ca: Dict = {
@@ -92,6 +124,7 @@ const ca: Dict = {
   "common.save": "DESA",
   "common.continue": "CONTINUA",
   "common.back": "ENRERE",
+  "common.points": "PTS",
 
   "nav.hunt": "CAÇA",
   "nav.ranks": "RANK",
@@ -112,9 +145,23 @@ const ca: Dict = {
   "auth.toSignUp": "Nou? Registra't",
   "auth.fail": "Error d'autenticació",
 
-  "hunt.title": "OBJECTIUS",
+  "hunt.title": "AQUESTA SETMANA",
+  "hunt.subtitle": "10 OBJECTIUS // TROBA'LS",
   "hunt.empty": "CAP CAÇA ACTIVA",
   "hunt.found": "TROBAT",
+  "hunt.progress": "PROGRÉS",
+  "hunt.points": "PUNTS",
+  "hunt.streak": "RATXA",
+  "hunt.streakDays": "DIES",
+  "hunt.daily": "BONUS DIARI 2x",
+  "hunt.dailyDesc": "Primera caça d'avui: punts DOBLES!",
+  "hunt.combo": "COMBO",
+  "hunt.comboDesc": "Caça 2 en 5 min: +50%",
+  "hunt.timeLeft": "ACABA EN",
+  "hunt.completed": "SETMANA COMPLETADA!",
+  "hunt.rank": "EL TEU RANG",
+  "hunt.others": "ALTRES HAN TROBAT",
+  "hunt.tap": "TOCA PER CAÇAR",
 
   "friends.title": "LA COLLA",
   "friends.search": "BUSCA USUARIS...",
@@ -136,6 +183,8 @@ const ca: Dict = {
   "rankings.global": "GLOBAL",
   "rankings.friends": "AMICS",
   "rankings.empty": "ENCARA NO HI HA DADES",
+  "rankings.foundShort": "TROBATS",
+  "rankings.you": "TU",
 
   "profile.title": "PERFIL",
   "profile.logout": "SURT",
@@ -146,6 +195,13 @@ const ca: Dict = {
   "profile.share": "COMPARTEIX",
   "profile.noCaptures": "CAP CAPTURA AQUESTA SETMANA",
   "profile.language": "IDIOMA",
+  "profile.badges": "MEDALLES",
+  "profile.badge.first": "PRIMERA CAÇA",
+  "profile.badge.streak": "EN RATXA",
+  "profile.badge.completer": "COMPLETISTA",
+  "profile.badge.speedster": "VELOCISTA",
+  "profile.badge.social": "SOCIABLE",
+  "profile.locked": "BLOQUEJAT",
 
   "camera.target": "OBJECTIU",
   "camera.color": "COLOR",
@@ -158,6 +214,14 @@ const ca: Dict = {
   "camera.notValid": "NO VÀLID",
   "camera.giveUp": "DEIXA-HO",
   "camera.alreadyCaught": "JA HAS CAÇAT AQUEST",
+  "camera.cameraDenied": "ACCÉS A LA CÀMERA DENEGAT. ACTIVA'L AL NAVEGADOR.",
+  "camera.goBack": "TORNA",
+  "camera.aiActive": "VISIÓ IA ACTIVA",
+  "camera.scan1": "ESCANEJANT IMATGE...",
+  "camera.scan2": "DETECTANT OBJECTES...",
+  "camera.scan3": "VERIFICANT OBJECTIU...",
+  "camera.scan4": "CALCULANT CONFIANÇA...",
+  "camera.bonus": "BONUS DE VELOCITAT!",
 };
 
 const es: Dict = {
@@ -168,6 +232,7 @@ const es: Dict = {
   "common.save": "GUARDAR",
   "common.continue": "CONTINUAR",
   "common.back": "ATRÁS",
+  "common.points": "PTS",
 
   "nav.hunt": "CAZA",
   "nav.ranks": "RANK",
@@ -188,9 +253,23 @@ const es: Dict = {
   "auth.toSignUp": "¿Nuevo? Regístrate",
   "auth.fail": "Error de autenticación",
 
-  "hunt.title": "OBJETIVOS",
+  "hunt.title": "ESTA SEMANA",
+  "hunt.subtitle": "10 OBJETIVOS // ENCUÉNTRALOS",
   "hunt.empty": "NO HAY CAZA ACTIVA",
   "hunt.found": "ENCONTRADO",
+  "hunt.progress": "PROGRESO",
+  "hunt.points": "PUNTOS",
+  "hunt.streak": "RACHA",
+  "hunt.streakDays": "DÍAS",
+  "hunt.daily": "BONUS DIARIO 2x",
+  "hunt.dailyDesc": "Primera caza de hoy: ¡puntos DOBLES!",
+  "hunt.combo": "COMBO",
+  "hunt.comboDesc": "Caza 2 en 5 min: +50%",
+  "hunt.timeLeft": "ACABA EN",
+  "hunt.completed": "¡SEMANA COMPLETADA!",
+  "hunt.rank": "TU RANGO",
+  "hunt.others": "OTROS LO ENCONTRARON",
+  "hunt.tap": "TOCA PARA CAZAR",
 
   "friends.title": "EL GRUPO",
   "friends.search": "BUSCA USUARIOS...",
@@ -212,6 +291,8 @@ const es: Dict = {
   "rankings.global": "GLOBAL",
   "rankings.friends": "AMIGOS",
   "rankings.empty": "AÚN NO HAY DATOS",
+  "rankings.foundShort": "HALLADOS",
+  "rankings.you": "TÚ",
 
   "profile.title": "PERFIL",
   "profile.logout": "SALIR",
@@ -222,6 +303,13 @@ const es: Dict = {
   "profile.share": "COMPARTIR",
   "profile.noCaptures": "SIN CAPTURAS ESTA SEMANA",
   "profile.language": "IDIOMA",
+  "profile.badges": "MEDALLAS",
+  "profile.badge.first": "PRIMERA CAZA",
+  "profile.badge.streak": "EN RACHA",
+  "profile.badge.completer": "COMPLETISTA",
+  "profile.badge.speedster": "VELOCISTA",
+  "profile.badge.social": "SOCIABLE",
+  "profile.locked": "BLOQUEADO",
 
   "camera.target": "OBJETIVO",
   "camera.color": "COLOR",
@@ -234,6 +322,14 @@ const es: Dict = {
   "camera.notValid": "NO VÁLIDO",
   "camera.giveUp": "RENDIRSE",
   "camera.alreadyCaught": "YA HAS CAZADO ESTE",
+  "camera.cameraDenied": "ACCESO A LA CÁMARA DENEGADO. ACTÍVALO EN EL NAVEGADOR.",
+  "camera.goBack": "VOLVER",
+  "camera.aiActive": "VISIÓN IA ACTIVA",
+  "camera.scan1": "ESCANEANDO IMAGEN...",
+  "camera.scan2": "DETECTANDO OBJETOS...",
+  "camera.scan3": "VERIFICANDO OBJETIVO...",
+  "camera.scan4": "CALCULANDO CONFIANZA...",
+  "camera.bonus": "¡BONUS DE VELOCIDAD!",
 };
 
 export const DICTS: Record<Lang, Dict> = { ca, es, en };
