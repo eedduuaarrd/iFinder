@@ -1,0 +1,27 @@
+"Crea una Progressive Web App (PWA) optimitzada per a mòbils anomenada 'FlashHunt'. L'aplicació és una caça del tresor setmanal on els usuaris han de trobar i fotografiar 10 objectes concrets al carrer o a casa.
+1. Estètica i UI (Crucial):
+• No vull un disseny genèric de tipus Bootstrap/IA. Vull una interfície 'Neo-Brutalista' o 'Gamified Dark Mode'.
+• Utilitza colors vibrants (groc elèctric #CCFF00, violeta) sobre fons negre mate.
+• Tipografia bold i sans-serif, targetes amb ombres dures i marcades, i micro-animacions (framer-motion) per a cada validació.
+• Layout: Navegació inferior (tab bar) neta: [Llista, Càmera, Rànquing, Amics].
+2. Sistema d'Autenticació:
+• Implementa Supabase Auth per gestionar el registre i login.
+• Opcions obligatòries: Social Login amb Google i Apple. Registre tradicional amb email/password com a backup.
+3. Lògica de la "Caça de la Setmana":
+• Cada setmana es genera una llista de 10 objectes (id, nom, punts, condició de color).
+• Utilitza TensorFlow.js (model COCO-SSD) per a la detecció d'objectes localment al dispositiu de l'usuari per evitar costos d'API.
+• Implementa una funció de validació de color analitzant els píxels de la imatge capturada dins de la "bounding box" de l'objecte detectat.
+4. Funcionalitats Socials i Gamificació:
+• Amics: Sistema de cerca d'usuaris, enviar/acceptar sol·licituds i veure la seva activitat (últim objecte trobat).
+• Rànquing Triple:
+1.	Global: Tots els usuaris.
+2.	Local: Basat en la ciutat de l'usuari (usa Geolocation API de forma anònima).
+3.	Amics: Només el cercle de l'usuari.
+• Compartir: Genera un link dinàmic (Deep Link) per convidar amics i un botó per exportar un 'Mosaic' estètic de les fotos de la setmana per a Instagram Stories.
+5. Stack Tècnic:
+• Frontend: React amb Vite o Next.js (App Router).
+• Styling: Tailwind CSS.
+• Backend/Base de Dades: Supabase (PostgreSQL) per guardar usuaris, amics, punts i historial.
+• IA: @tensorflow-models/coco-ssd i @tensorflow/tfjs.
+6. Flow d'usuari:
+• L'usuari obre l'app -> Veu la llista actual -> Clica un ítem -> S'obre la càmera integrada -> La IA detecta l'objecte en temps real -> Si coincideix amb la descripció i color, l'ítem es marca com a 'Trobat' amb una animació de confeti -> Se sumen els punts al rànquing."

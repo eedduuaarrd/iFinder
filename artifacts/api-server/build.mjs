@@ -60,6 +60,7 @@ async function buildAll() {
       "@mikro-orm/*",
       "@grpc/*",
       "@swc/*",
+      "@google/genai",
       "@aws-sdk/*",
       "@azure/*",
       "@opentelemetry/*",
