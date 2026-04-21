@@ -20,10 +20,15 @@ function serializeUser(user: Record<string, any>) {
 }
 
 router.post("/auth/register", async (req, res): Promise<void> => {
-  const { email, password, username } = req.body;
+  const { email, password, username, city } = req.body;
 
   if (!email || !password || !username) {
     res.status(400).json({ error: "Email, password and username are required" });
+    return;
+  }
+
+  if (!city || typeof city !== "string" || city.trim().length < 2) {
+    res.status(400).json({ error: "City is required" });
     return;
   }
 
@@ -52,6 +57,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     email,
     username,
     passwordHash,
+    city: city.trim(),
     totalPoints: 0,
   }).returning();
 

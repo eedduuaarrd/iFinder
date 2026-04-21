@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { LanguageProvider, useLang } from "@/i18n/LanguageContext";
 import NotFound from "@/pages/not-found";
 import Auth from "@/pages/auth";
 import Hunt from "@/pages/hunt";
@@ -41,15 +42,16 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function AppShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { user } = useAuth();
+  const { t } = useLang();
 
   if (location === "/auth" || location.startsWith("/camera")) {
     return <>{children}</>;
   }
 
   const navItems = [
-    { path: "/hunt", icon: Target, label: "HUNT" },
-    { path: "/rankings", icon: Trophy, label: "RANKS" },
-    { path: "/friends", icon: Users, label: "CREW" },
+    { path: "/hunt", icon: Target, label: t("nav.hunt") },
+    { path: "/rankings", icon: Trophy, label: t("nav.ranks") },
+    { path: "/friends", icon: Users, label: t("nav.crew") },
   ];
 
   return (
@@ -137,6 +139,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
       <AuthProvider>
         <TooltipProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
@@ -147,6 +150,7 @@ function App() {
           <Toaster />
         </TooltipProvider>
       </AuthProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

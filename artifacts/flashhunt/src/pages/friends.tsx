@@ -9,8 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, UserPlus, Check, X, UserMinus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useLang } from "@/i18n/LanguageContext";
 
 export default function Friends() {
+  const { t } = useLang();
   const [searchQuery, setSearchQuery] = useState("");
   const { data: friends, isLoading: isLoadingFriends } = useGetFriends();
   const { data: requests } = useGetFriendRequests();
@@ -34,31 +36,38 @@ export default function Friends() {
   const handleSendRequest = (userId: string) => {
     sendRequest.mutate({ data: { toUserId: userId } }, {
       onSuccess: () => {
-        toast({ title: "REQUEST SENT", description: "Friend request dispatched." });
+        toast({ title: t("friends.requestSent"), description: t("friends.requestSentDesc") });
         setSearchQuery("");
+      },
+      onError: (err: any) => {
+        toast({ title: t("common.error"), description: err?.message ?? "Failed", variant: "destructive" });
       }
     });
   };
 
-  const handleAccept = (id: number) => {
-    acceptRequest.mutate({ id }, {
+  const handleAccept = (requestId: number) => {
+    acceptRequest.mutate({ requestId }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetFriendsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetFriendRequestsQueryKey() });
+        toast({ title: t("friends.accepted"), description: t("friends.acceptedDesc") });
+      },
+      onError: (err: any) => {
+        toast({ title: t("common.error"), description: err?.message ?? "Failed", variant: "destructive" });
       }
     });
   };
 
-  const handleReject = (id: number) => {
-    rejectRequest.mutate({ id }, {
+  const handleReject = (requestId: number) => {
+    rejectRequest.mutate({ requestId }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetFriendRequestsQueryKey() });
       }
     });
   };
 
-  const handleRemove = (id: number) => {
-    removeFriend.mutate({ id }, {
+  const handleRemove = (friendId: number) => {
+    removeFriend.mutate({ friendId }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetFriendsQueryKey() });
       }
@@ -67,11 +76,11 @@ export default function Friends() {
 
   return (
     <div className="pb-24">
-      <h1 className="text-3xl font-bold font-mono text-primary uppercase tracking-tighter mb-6">THE CREW</h1>
+      <h1 className="text-3xl font-bold font-mono text-primary uppercase tracking-tighter mb-6">{t("friends.title")}</h1>
 
       <form onSubmit={handleSearch} className="flex gap-2 mb-8">
         <Input 
-          placeholder="SEARCH USERNAMES..." 
+          placeholder={t("friends.search")} 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="rounded-none border-2 focus-visible:ring-0 focus-visible:border-primary font-mono uppercase bg-card"
@@ -83,7 +92,7 @@ export default function Friends() {
 
       {searchQuery && searchResults && searchResults.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-mono text-muted-foreground uppercase mb-3 border-b-2 border-border pb-1">SEARCH RESULTS</h2>
+          <h2 className="text-sm font-mono text-muted-foreground uppercase mb-3 border-b-2 border-border pb-1">{t("friends.searchResults")}</h2>
           <div className="space-y-2">
             {searchResults.map(user => (
               <Card key={user.id} className="p-3 rounded-none border-2 flex items-center justify-between bg-card">
@@ -95,7 +104,7 @@ export default function Friends() {
                   <span className="font-bold uppercase">{user.username}</span>
                 </div>
                 <Button size="sm" onClick={() => handleSendRequest(user.id)} className="rounded-none h-8 bg-secondary hover:bg-secondary/90 text-secondary-foreground border-2 border-transparent">
-                  <UserPlus className="w-4 h-4 mr-1" /> ADD
+                  <UserPlus className="w-4 h-4 mr-1" /> {t("friends.add")}
                 </Button>
               </Card>
             ))}
@@ -105,7 +114,7 @@ export default function Friends() {
 
       {requests && requests.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-mono text-secondary uppercase mb-3 border-b-2 border-secondary pb-1">PENDING REQUESTS</h2>
+          <h2 className="text-sm font-mono text-secondary uppercase mb-3 border-b-2 border-secondary pb-1">{t("friends.pending")}</h2>
           <div className="space-y-2">
             {requests.map(req => (
               <Card key={req.id} className="p-3 rounded-none border-2 border-secondary bg-card">
@@ -133,7 +142,7 @@ export default function Friends() {
       )}
 
       <div>
-        <h2 className="text-sm font-mono text-muted-foreground uppercase mb-3 border-b-2 border-border pb-1">ALLIES</h2>
+        <h2 className="text-sm font-mono text-muted-foreground uppercase mb-3 border-b-2 border-border pb-1">{t("friends.allies")}</h2>
         {isLoadingFriends ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
@@ -153,7 +162,7 @@ export default function Friends() {
                     <div className="font-bold uppercase">{friend.username}</div>
                     {friend.lastItemFound && (
                       <div className="text-xs text-muted-foreground font-mono uppercase truncate max-w-[150px]">
-                        FOUND: {friend.lastItemFound}
+                        {t("friends.foundLabel")} {friend.lastItemFound}
                       </div>
                     )}
                   </div>
@@ -161,7 +170,7 @@ export default function Friends() {
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-2">
                     <div className="font-bold font-mono text-primary">{friend.weekPoints}</div>
-                    <div className="text-[10px] text-muted-foreground uppercase">WK PTS</div>
+                    <div className="text-[10px] text-muted-foreground uppercase">{t("friends.weekPts")}</div>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => handleRemove(friend.id)} className="h-8 w-8 rounded-none text-muted-foreground hover:text-destructive hover:bg-destructive/10">
                     <UserMinus className="w-4 h-4" />
@@ -172,8 +181,8 @@ export default function Friends() {
           </div>
         ) : (
           <div className="text-center p-8 text-muted-foreground font-mono uppercase border-2 border-dashed border-border mt-4">
-            YOU HUNT ALONE.
-            <br />FIND SOME FRIENDS.
+            {t("friends.alone")}
+            <br />{t("friends.findFriends")}
           </div>
         )}
       </div>

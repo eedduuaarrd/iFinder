@@ -4,11 +4,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Share2, MapPin, Award, Trophy } from "lucide-react";
+import { LogOut, Share2, MapPin, Award, Trophy, Languages } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLang } from "@/i18n/LanguageContext";
+import { LANGS } from "@/i18n/translations";
 
 export default function Profile() {
   const { signOut } = useAuth();
+  const { t, lang, setLang } = useLang();
   const { data: user, isLoading: isLoadingUser } = useGetMe();
   const { data: stats, isLoading: isLoadingStats } = useGetRankingStats();
   const { data: mosaic, isLoading: isLoadingMosaic } = useGetMyMosaic();
@@ -40,9 +43,9 @@ export default function Profile() {
   return (
     <div className="pb-24">
       <div className="flex justify-between items-start mb-6">
-        <h1 className="text-3xl font-bold font-mono text-primary uppercase tracking-tighter">DOSSIER</h1>
-        <Button variant="outline" size="sm" onClick={signOut} className="rounded-none border-2 font-mono uppercase text-xs h-8 text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-transparent">
-          <LogOut className="w-3 h-3 mr-2" /> LOGOUT
+        <h1 className="text-3xl font-bold font-mono text-primary uppercase tracking-tighter">{t("profile.title")}</h1>
+        <Button variant="outline" size="sm" onClick={signOut} className="rounded-none border-2 font-mono uppercase text-xs h-8 text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-transparent" data-testid="button-logout">
+          <LogOut className="w-3 h-3 mr-2" /> {t("profile.logout")}
         </Button>
       </div>
 
@@ -63,7 +66,7 @@ export default function Profile() {
               </div>
             )}
             <div className="mt-3 inline-block bg-primary text-primary-foreground font-mono font-bold px-3 py-1 text-sm">
-              TOTAL PTS: {user?.totalPoints || 0}
+              {t("profile.totalPts")}: {user?.totalPoints || 0}
             </div>
           </div>
         </div>
@@ -73,20 +76,20 @@ export default function Profile() {
         <Card className="p-4 rounded-none border-2 border-secondary bg-secondary/10 flex flex-col items-center text-center">
           <Award className="w-8 h-8 text-secondary mb-2" />
           <div className="text-3xl font-mono font-bold text-secondary">{stats?.weekPoints || 0}</div>
-          <div className="text-xs font-mono uppercase text-muted-foreground mt-1">WEEK POINTS</div>
+          <div className="text-xs font-mono uppercase text-muted-foreground mt-1">{t("profile.weekPoints")}</div>
         </Card>
         <Card className="p-4 rounded-none border-2 border-primary bg-primary/10 flex flex-col items-center text-center">
           <Trophy className="w-8 h-8 text-primary mb-2" />
           <div className="text-3xl font-mono font-bold text-primary">#{stats?.globalRank || '-'}</div>
-          <div className="text-xs font-mono uppercase text-muted-foreground mt-1">GLOBAL RANK</div>
+          <div className="text-xs font-mono uppercase text-muted-foreground mt-1">{t("profile.globalRank")}</div>
         </Card>
       </div>
 
       <div className="mb-8">
         <div className="flex justify-between items-center border-b-2 border-border pb-2 mb-4">
-          <h2 className="text-sm font-mono text-muted-foreground uppercase">WEEKLY MOSAIC</h2>
+          <h2 className="text-sm font-mono text-muted-foreground uppercase">{t("profile.weeklyMosaic")}</h2>
           <Button variant="ghost" size="sm" onClick={handleShare} className="rounded-none h-6 text-primary hover:text-primary hover:bg-primary/20 px-2 font-mono text-xs">
-            <Share2 className="w-3 h-3 mr-1" /> SHARE
+            <Share2 className="w-3 h-3 mr-1" /> {t("profile.share")}
           </Button>
         </div>
         
@@ -111,9 +114,32 @@ export default function Profile() {
           </div>
         ) : (
           <Card className="p-8 text-center border-2 border-dashed border-border rounded-none bg-transparent">
-            <p className="text-muted-foreground font-mono uppercase text-sm">NO CAPTURES THIS WEEK</p>
+            <p className="text-muted-foreground font-mono uppercase text-sm">{t("profile.noCaptures")}</p>
           </Card>
         )}
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-sm font-mono text-muted-foreground uppercase border-b-2 border-border pb-2 mb-4 flex items-center gap-2">
+          <Languages className="w-4 h-4" /> {t("profile.language")}
+        </h2>
+        <div className="grid grid-cols-3 gap-2">
+          {LANGS.map((l) => (
+            <button
+              key={l.code}
+              onClick={() => setLang(l.code)}
+              data-testid={`button-profile-lang-${l.code}`}
+              className={`px-3 py-3 border-2 font-mono font-bold uppercase text-xs transition-all ${
+                lang === l.code
+                  ? "bg-primary text-primary-foreground border-primary shadow-[3px_3px_0px_0px_hsl(var(--foreground))]"
+                  : "bg-card text-foreground border-border hover:border-primary"
+              }`}
+            >
+              <div className="text-base">{l.flag}</div>
+              <div className="text-[9px] mt-1 opacity-80">{l.label}</div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
