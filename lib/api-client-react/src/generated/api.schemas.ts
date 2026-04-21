@@ -115,11 +115,8 @@ export interface HuntProgress {
 
 export interface CreateSubmissionBody {
   huntItemId: number;
-  photoUrl: string;
-  detectedLabel: string;
-  /** @nullable */
-  detectedColor?: string | null;
-  confidence: number;
+  /** Image data URL (data:image/jpeg;base64,...) */
+  imageBase64: string;
   /** @nullable */
   latitude?: number | null;
   /** @nullable */
@@ -138,6 +135,17 @@ export interface Submission {
   pointsAwarded: number;
   status: string;
   foundAt: string;
+}
+
+export interface SubmissionResult {
+  accepted: boolean;
+  confidence: number;
+  reason: string;
+  /** @nullable */
+  detectedLabel?: string | null;
+  /** @nullable */
+  detectedColor?: string | null;
+  submission?: Submission | null;
 }
 
 export type MosaicDataPhotosItem = {

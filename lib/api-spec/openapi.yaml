@@ -134,13 +134,19 @@ paths:
               $ref: "#/components/schemas/CreateSubmissionBody"
       responses:
         "201":
-          description: Submission created
+          description: Submission created and validated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Submission"
+                $ref: "#/components/schemas/SubmissionResult"
+        "422":
+          description: Image rejected by AI validation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmissionResult"
         "400":
-          description: Invalid submission
+          description: Invalid request
           content:
             application/json:
               schema:
@@ -642,23 +648,16 @@ components:
       properties:
         huntItemId:
           type: integer
-        photoUrl:
+        imageBase64:
           type: string
-        detectedLabel:
-          type: string
-        detectedColor:
-          type: ["string", "null"]
-        confidence:
-          type: number
+          description: Image data URL (data:image/jpeg;base64,...)
         latitude:
           type: ["number", "null"]
         longitude:
           type: ["number", "null"]
       required:
         - huntItemId
-        - photoUrl
-        - detectedLabel
-        - confidence
+        - imageBase64
 
     Submission:
       type: object
@@ -693,6 +692,28 @@ components:
         - pointsAwarded
         - status
         - foundAt
+
+    SubmissionResult:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+        confidence:
+          type: number
+        reason:
+          type: string
+        detectedLabel:
+          type: ["string", "null"]
+        detectedColor:
+          type: ["string", "null"]
+        submission:
+          oneOf:
+            - $ref: "#/components/schemas/Submission"
+            - type: "null"
+      required:
+        - accepted
+        - confidence
+        - reason
 
     MosaicData:
       type: object

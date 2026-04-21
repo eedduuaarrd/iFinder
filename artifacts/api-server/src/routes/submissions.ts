@@ -6,6 +6,7 @@ import {
   GetMySubmissionsResponse,
   GetMyMosaicResponse,
 } from "@workspace/api-zod";
+import { validateHuntImage } from "../lib/validate-image";
 
 const router: IRouter = Router();
 
@@ -22,7 +23,7 @@ router.post("/submissions", async (req, res): Promise<void> => {
     return;
   }
 
-  const { huntItemId, photoUrl, detectedLabel, detectedColor, confidence, latitude, longitude } = parsed.data;
+  const { huntItemId, imageBase64, latitude, longitude } = parsed.data;
 
   const [item] = await db.select().from(huntItemsTable).where(eq(huntItemsTable.id, huntItemId));
   if (!item) {
@@ -40,13 +41,40 @@ router.post("/submissions", async (req, res): Promise<void> => {
     return;
   }
 
+  let validation;
+  try {
+    validation = await validateHuntImage({
+      itemName: item.name,
+      description: item.description ?? item.name,
+      requiredColor: item.requiredColor,
+      cocoLabel: item.cocoLabel,
+      imageBase64,
+    });
+  } catch (err) {
+    req.log?.error({ err }, "AI validation failed");
+    res.status(500).json({ error: "AI validation service unavailable. Please try again." });
+    return;
+  }
+
+  if (!validation.accepted) {
+    res.status(422).json({
+      accepted: false,
+      confidence: validation.confidence,
+      reason: validation.reason,
+      detectedLabel: validation.detectedLabel,
+      detectedColor: validation.detectedColor,
+      submission: null,
+    });
+    return;
+  }
+
   const [submission] = await db.insert(submissionsTable).values({
     userId,
     huntItemId,
-    photoUrl,
-    detectedLabel,
-    detectedColor: detectedColor ?? null,
-    confidence,
+    photoUrl: imageBase64,
+    detectedLabel: validation.detectedLabel ?? item.cocoLabel,
+    detectedColor: validation.detectedColor,
+    confidence: validation.confidence,
     pointsAwarded: item.points,
     status: "accepted",
     latitude: latitude ?? null,
@@ -58,16 +86,23 @@ router.post("/submissions", async (req, res): Promise<void> => {
     .where(eq(usersTable.id, userId));
 
   res.status(201).json({
-    id: submission.id,
-    userId: submission.userId,
-    huntItemId: submission.huntItemId,
-    photoUrl: submission.photoUrl,
-    detectedLabel: submission.detectedLabel,
-    detectedColor: submission.detectedColor,
-    confidence: submission.confidence,
-    pointsAwarded: submission.pointsAwarded,
-    status: submission.status,
-    foundAt: submission.foundAt.toISOString(),
+    accepted: true,
+    confidence: validation.confidence,
+    reason: validation.reason,
+    detectedLabel: validation.detectedLabel,
+    detectedColor: validation.detectedColor,
+    submission: {
+      id: submission.id,
+      userId: submission.userId,
+      huntItemId: submission.huntItemId,
+      photoUrl: submission.photoUrl,
+      detectedLabel: submission.detectedLabel,
+      detectedColor: submission.detectedColor,
+      confidence: submission.confidence,
+      pointsAwarded: submission.pointsAwarded,
+      status: submission.status,
+      foundAt: submission.foundAt.toISOString(),
+    },
   });
 });
 

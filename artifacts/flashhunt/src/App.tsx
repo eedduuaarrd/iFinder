@@ -100,9 +100,11 @@ function RootRedirect() {
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
-  if (!isLoading) {
-    setLocation(user ? "/hunt" : "/auth");
-  }
+  React.useEffect(() => {
+    if (!isLoading) {
+      setLocation(user ? "/hunt" : "/auth");
+    }
+  }, [isLoading, user, setLocation]);
 
   return <div className="min-h-[100dvh] bg-background" />;
 }

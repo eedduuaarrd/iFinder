@@ -104,10 +104,9 @@ export const GetMyProgressResponse = zod.object({
  */
 export const SubmitHuntItemBody = zod.object({
   huntItemId: zod.number(),
-  photoUrl: zod.string(),
-  detectedLabel: zod.string(),
-  detectedColor: zod.string().nullish(),
-  confidence: zod.number(),
+  imageBase64: zod
+    .string()
+    .describe("Image data URL (data:image\/jpeg;base64,...)"),
   latitude: zod.number().nullish(),
   longitude: zod.number().nullish(),
 });

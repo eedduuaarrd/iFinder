@@ -18,10 +18,9 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (user) {
-    setLocation("/hunt");
-    return null;
-  }
+  React.useEffect(() => {
+    if (user) setLocation("/hunt");
+  }, [user, setLocation]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();

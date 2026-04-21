@@ -36,6 +36,7 @@ import type {
   SearchUsersParams,
   SendFriendRequestBody,
   Submission,
+  SubmissionResult,
   UpdateProfileBody,
   User,
   UserProfile,
@@ -528,8 +529,8 @@ export const getSubmitHuntItemUrl = () => {
 export const submitHuntItem = async (
   createSubmissionBody: CreateSubmissionBody,
   options?: RequestInit,
-): Promise<Submission> => {
-  return customFetch<Submission>(getSubmitHuntItemUrl(), {
+): Promise<SubmissionResult> => {
+  return customFetch<SubmissionResult>(getSubmitHuntItemUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
@@ -538,7 +539,7 @@ export const submitHuntItem = async (
 };
 
 export const getSubmitHuntItemMutationOptions = <
-  TError = ErrorType<ErrorResponse>,
+  TError = ErrorType<ErrorResponse | SubmissionResult>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -579,13 +580,15 @@ export type SubmitHuntItemMutationResult = NonNullable<
   Awaited<ReturnType<typeof submitHuntItem>>
 >;
 export type SubmitHuntItemMutationBody = BodyType<CreateSubmissionBody>;
-export type SubmitHuntItemMutationError = ErrorType<ErrorResponse>;
+export type SubmitHuntItemMutationError = ErrorType<
+  ErrorResponse | SubmissionResult
+>;
 
 /**
  * @summary Submit a found hunt item
  */
 export const useSubmitHuntItem = <
-  TError = ErrorType<ErrorResponse>,
+  TError = ErrorType<ErrorResponse | SubmissionResult>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
