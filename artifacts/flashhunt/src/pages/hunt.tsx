@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useLocation } from "wouter";
-import { useGetHuntItems, useGetCurrentHunt } from "@workspace/api-client-react";
+import { useGetHuntItems, useGetCurrentHunt, type HuntItemWithStatus } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -37,7 +37,7 @@ export default function Hunt() {
     if (!items) return [];
     // Sort: unfound first, by difficulty asc (easy → insane)
     const order: Record<string, number> = { easy: 0, medium: 1, hard: 2, insane: 3 };
-    return [...items].sort((a, b) => {
+    return [...items].sort((a: HuntItemWithStatus, b: HuntItemWithStatus) => {
       if (a.found !== b.found) return a.found ? 1 : -1;
       const da = order[a.difficulty?.toLowerCase() ?? "medium"] ?? 1;
       const db = order[b.difficulty?.toLowerCase() ?? "medium"] ?? 1;
@@ -45,17 +45,17 @@ export default function Hunt() {
     });
   }, [items]);
 
-  const found = items?.filter((i) => i.found).length ?? 0;
+  const found = items?.filter((i: HuntItemWithStatus) => i.found).length ?? 0;
   const total = items?.length ?? 10;
-  const points = items?.filter((i) => i.found).reduce((s, i) => s + i.points, 0) ?? 0;
-  const totalPoints = items?.reduce((s, i) => s + i.points, 0) ?? 0;
+  const points = items?.filter((i: HuntItemWithStatus) => i.found).reduce((s: number, i: HuntItemWithStatus) => s + i.points, 0) ?? 0;
+  const totalPoints = items?.reduce((s: number, i: HuntItemWithStatus) => s + i.points, 0) ?? 0;
   const pct = total > 0 ? (found / total) * 100 : 0;
 
   // Pick a "daily challenge" item (deterministic per day) — first unfound after rotation
   const challengeItem = useMemo(() => {
     if (!items?.length) return null;
     const dayIndex = Math.floor(Date.now() / 86400000);
-    const unfound = items.filter((i) => !i.found);
+    const unfound = items.filter((i: HuntItemWithStatus) => !i.found);
     if (unfound.length === 0) return null;
     return unfound[dayIndex % unfound.length];
   }, [items]);

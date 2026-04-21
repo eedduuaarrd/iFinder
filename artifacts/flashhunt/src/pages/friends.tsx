@@ -16,7 +16,7 @@ export default function Friends() {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: friends, isLoading: isLoadingFriends } = useGetFriends();
   const { data: requests } = useGetFriendRequests();
-  const { data: searchResults, refetch: refetchSearch } = useSearchUsers({ q: searchQuery }, { query: { enabled: false } });
+  const { data: searchResults, refetch: refetchSearch } = useSearchUsers({ q: searchQuery });
   
   const sendRequest = useSendFriendRequest();
   const acceptRequest = useAcceptFriendRequest();

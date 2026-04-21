@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { LanguageProvider, useLang } from "@/i18n/LanguageContext";
 import { LANGS } from "@/i18n/translations";
-import { useGetHuntItems } from "@workspace/api-client-react";
+import { useGetHuntItems, type HuntItemWithStatus } from "@workspace/api-client-react";
 import NotFound from "@/pages/not-found";
 import Auth from "@/pages/auth";
 import Hunt from "@/pages/hunt";
@@ -62,9 +62,10 @@ function LangSwitcher({ compact = false }: { compact?: boolean }) {
 
 function HuntBadge() {
   const { user } = useAuth();
-  const { data: items } = useGetHuntItems(undefined, { query: { enabled: !!user } });
-  const remaining = items ? items.filter((i) => !i.found).length : 0;
-  if (!user || remaining === 0) return null;
+  const { data: items } = useGetHuntItems();
+  if (!user) return null;
+  const remaining = items ? items.filter((i: HuntItemWithStatus) => !i.found).length : 0;
+  if (remaining === 0) return null;
   return (
     <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary text-primary-foreground border-2 border-background font-mono text-[10px] font-bold flex items-center justify-center rounded-full">
       {remaining}

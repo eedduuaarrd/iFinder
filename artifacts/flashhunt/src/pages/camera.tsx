@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation } from "wouter";
-import { useGetHuntItems, getGetHuntItemsQueryKey, getGetMyMosaicQueryKey } from "@workspace/api-client-react";
+import { useGetHuntItems, getGetHuntItemsQueryKey, getGetMyMosaicQueryKey, type HuntItemWithStatus } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera as CameraIcon, X, Zap, AlertTriangle, Lightbulb, RotateCcw, Flame } from "lucide-react";
@@ -40,7 +40,7 @@ export default function CameraPage() {
   const ANALYSIS_LINES = [t("camera.scan1"), t("camera.scan2"), t("camera.scan3"), t("camera.scan4")];
 
   const { data: items } = useGetHuntItems();
-  const targetItem = items?.find((i) => i.id === itemId);
+  const targetItem = items?.find((i: HuntItemWithStatus) => i.id === itemId);
   const targetTr = targetItem ? translateHuntItem(targetItem, lang) : null;
   const targetEmoji = targetItem ? getItemEmoji(targetItem.cocoLabel, targetItem.requiredColor) : "🎯";
   const queryClient = useQueryClient();

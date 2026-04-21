@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetMe, useGetRankingStats, useGetMyMosaic } from "@workspace/api-client-react";
+import { useGetMe, useGetRankingStats, useGetMyMosaic, type MosaicDataPhotosItem } from "@workspace/api-client-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -144,7 +144,7 @@ export default function Profile() {
         ) : mosaic && mosaic.photos && mosaic.photos.length > 0 ? (
           <div className="border-2 border-foreground bg-black p-2">
             <div className="grid grid-cols-3 gap-2">
-              {mosaic.photos.slice(0, 9).map((photo, i) => (
+              {mosaic.photos.slice(0, 9).map((photo: MosaicDataPhotosItem, i: number) => (
                 <div key={i} className="aspect-square relative group overflow-hidden border border-border/50">
                   <img src={photo.photoUrl} alt={photo.itemName} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300" />
                   <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
