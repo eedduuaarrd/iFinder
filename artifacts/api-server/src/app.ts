@@ -41,7 +41,7 @@ app.use(
     store: new PgSession({
       pool,
       tableName: "session",
-      createTableIfMissing: true,
+      createTableIfMissing: false,
     }),
     secret: process.env.SESSION_SECRET ?? "flashhunt-dev-secret-change-in-prod",
     resave: false,
