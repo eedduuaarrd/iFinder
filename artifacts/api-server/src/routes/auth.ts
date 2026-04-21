@@ -63,6 +63,9 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.session.userEmail = user.email;
+  await new Promise<void>((resolve, reject) =>
+    req.session.save((err) => (err ? reject(err) : resolve())),
+  );
 
   res.status(201).json(GetMeResponse.parse(serializeUser(user)));
 });
@@ -89,6 +92,9 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.session.userEmail = user.email;
+  await new Promise<void>((resolve, reject) =>
+    req.session.save((err) => (err ? reject(err) : resolve())),
+  );
 
   res.json(GetMeResponse.parse(serializeUser(user)));
 });
